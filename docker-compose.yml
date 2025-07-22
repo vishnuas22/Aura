@@ -1,0 +1,304 @@
+# =============================================================================
+# AI RESEARCH ASSISTANT - DOCKER COMPOSE CONFIGURATION
+# =============================================================================
+
+version: '3.8'
+
+services:
+  # =============================================================================
+  # BACKEND SERVICE
+  # =============================================================================
+  backend:
+    build:
+      context: .
+      target: development
+      dockerfile: Dockerfile
+    container_name: ai-research-backend
+    ports:
+      - "8001:8001"
+    volumes:
+      - .:/app
+      - backend_logs:/app/logs
+      - backend_cache:/app/.cache
+    environment:
+      - MONGO_URL=mongodb://mongodb:27017
+      - DB_NAME=ai_research_assistant
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - DEBUG=true
+      - LOG_LEVEL=DEBUG
+      - CORS_ORIGINS=http://localhost:3000
+    depends_on:
+      - mongodb
+      - redis
+    networks:
+      - ai_research_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=Host(`api.localhost`)"
+      - "traefik.http.services.backend.loadbalancer.server.port=8001"
+
+  # =============================================================================
+  # FRONTEND SERVICE
+  # =============================================================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: ai-research-frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - REACT_APP_BACKEND_URL=http://localhost:8001
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+    depends_on:
+      - backend
+    networks:
+      - ai_research_network
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`localhost`)"
+      - "traefik.http.services.frontend.loadbalancer.server.port=3000"
+
+  # =============================================================================
+  # DATABASE SERVICE
+  # =============================================================================
+  mongodb:
+    image: mongo:7.0
+    container_name: ai-research-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+      - ./scripts/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    environment:
+      - MONGO_INITDB_DATABASE=ai_research_assistant
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME:-admin}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD:-password123}
+    networks:
+      - ai_research_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # =============================================================================
+  # REDIS CACHE SERVICE
+  # =============================================================================
+  redis:
+    image: redis:7.2-alpine
+    container_name: ai-research-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+      - ./config/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    command: redis-server /usr/local/etc/redis/redis.conf
+    networks:
+      - ai_research_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # =============================================================================
+  # NGINX REVERSE PROXY (Optional - for production-like setup)
+  # =============================================================================
+  nginx:
+    image: nginx:alpine
+    container_name: ai-research-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./config/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./config/nginx/conf.d:/etc/nginx/conf.d:ro
+      - nginx_logs:/var/log/nginx
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - ai_research_network
+    restart: unless-stopped
+    profiles:
+      - production
+
+  # =============================================================================
+  # MONITORING SERVICES (Optional - for development monitoring)
+  # =============================================================================
+  
+  # Prometheus for metrics collection
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: ai-research-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    networks:
+      - ai_research_network
+    restart: unless-stopped
+    profiles:
+      - monitoring
+
+  # Grafana for metrics visualization
+  grafana:
+    image: grafana/grafana:latest
+    container_name: ai-research-grafana
+    ports:
+      - "3001:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./config/grafana/provisioning:/etc/grafana/provisioning:ro
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin123}
+      - GF_SERVER_ROOT_URL=http://localhost:3001
+    depends_on:
+      - prometheus
+    networks:
+      - ai_research_network
+    restart: unless-stopped
+    profiles:
+      - monitoring
+
+  # =============================================================================
+  # TESTING SERVICES
+  # =============================================================================
+  
+  # Test runner service
+  test-runner:
+    build:
+      context: .
+      target: testing
+    container_name: ai-research-tests
+    volumes:
+      - .:/app
+      - test_reports:/app/htmlcov
+    environment:
+      - MONGO_URL=mongodb://mongodb-test:27017
+      - DB_NAME=ai_research_test
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - TESTING=true
+    depends_on:
+      - mongodb-test
+    networks:
+      - ai_research_test_network
+    profiles:
+      - testing
+    command: python -m pytest tests/ --cov=backend --cov-report=html --cov-report=term-missing -v
+
+  # Test database (isolated from development)
+  mongodb-test:
+    image: mongo:7.0
+    container_name: ai-research-mongodb-test
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongodb_test_data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=ai_research_test
+    networks:
+      - ai_research_test_network
+    profiles:
+      - testing
+
+# =============================================================================
+# NETWORKS
+# =============================================================================
+networks:
+  ai_research_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+  ai_research_test_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16
+
+# =============================================================================
+# VOLUMES
+# =============================================================================
+volumes:
+  # Database volumes
+  mongodb_data:
+    driver: local
+  mongodb_config:
+    driver: local
+  mongodb_test_data:
+    driver: local
+    
+  # Cache volumes
+  redis_data:
+    driver: local
+  backend_cache:
+    driver: local
+    
+  # Application volumes
+  backend_logs:
+    driver: local
+  nginx_logs:
+    driver: local
+  test_reports:
+    driver: local
+    
+  # Monitoring volumes
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+
+# =============================================================================
+# DEVELOPMENT COMMANDS
+# =============================================================================
+
+# Usage:
+# Development mode:
+#   docker-compose up -d
+#
+# With monitoring:
+#   docker-compose --profile monitoring up -d
+#
+# Run tests:
+#   docker-compose --profile testing up test-runner
+#
+# Production-like setup:
+#   docker-compose --profile production up -d
+#
+# View logs:
+#   docker-compose logs -f [service-name]
+#
+# Scale services:
+#   docker-compose up -d --scale backend=3
+#
+# Stop all services:
+#   docker-compose down
+#
+# Clean up (including volumes):
+#   docker-compose down -v --remove-orphans
