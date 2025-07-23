@@ -9,10 +9,10 @@ from datetime import datetime
 import statistics
 
 from .base_agent import BaseAIAgent
-from ..core.config import AgentConfig
-from ..core.exceptions import AgentException
-from ..tools.agent_tools import get_tools_for_agent
-from ..utils.logging_utils import log_agent_performance, log_agent_task
+from core.config import AgentConfig
+from core.exceptions import AgentException
+from tools.agent_tools import get_tools_for_agent
+from utils.logging_utils import log_agent_performance, log_agent_task
 
 
 class AnalystAgent(BaseAIAgent):

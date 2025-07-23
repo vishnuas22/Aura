@@ -15,8 +15,8 @@ from .model_config import (
     optimize_config_for_context,
     ModelConfiguration
 )
-from ..core.exceptions import ModelException
-from ..core.metrics import get_metrics_collector, MetricType
+from core.exceptions import ModelException
+from core.metrics import get_metrics_collector, MetricType
 
 
 class LLMIntegration:

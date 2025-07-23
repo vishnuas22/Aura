@@ -1,0 +1,174 @@
+2025-07-23 16:13:42 - agent.researcher_999fe423 - [researcher_999fe423] - INFO - Initializing researcher agent: researcher_999fe423
+2025-07-23 16:13:42 - agent.researcher_999fe423 - [researcher_999fe423] - DEBUG - Memory management initialized
+2025-07-23 16:13:42 - agent.researcher_999fe423 - [researcher_999fe423] - DEBUG - Communication system initialized
+2025-07-23 16:13:42 - agent.researcher_999fe423 - [researcher_999fe423] - DEBUG - LLM integration initialized successfully
+2025-07-23 16:13:42 - agent.researcher_999fe423 - [researcher_999fe423] - INFO - Agent researcher_999fe423 initialized successfully
+2025-07-23 16:15:08 - agent.researcher_b6406c84 - [researcher_b6406c84] - INFO - Initializing researcher agent: researcher_b6406c84
+2025-07-23 16:15:08 - agent.researcher_b6406c84 - [researcher_b6406c84] - DEBUG - Memory management initialized
+2025-07-23 16:15:08 - agent.researcher_b6406c84 - [researcher_b6406c84] - DEBUG - Communication system initialized
+2025-07-23 16:15:08 - agent.researcher_b6406c84 - [researcher_b6406c84] - DEBUG - LLM integration initialized successfully
+2025-07-23 16:15:08 - agent.researcher_b6406c84 - [researcher_b6406c84] - INFO - Agent researcher_b6406c84 initialized successfully
+2025-07-23 16:15:08 - agent.researcher_b6406c84 - [researcher_b6406c84] - INFO - Agent initialized with 3 tools
+2025-07-23 16:15:08 - agent.researcher_b6406c84 - [researcher_b6406c84] - INFO - Researcher agent initialized: researcher_b6406c84
+2025-07-23 16:15:08 - agent.researcher_b6406c84 - [researcher_b6406c84] - INFO - Agent researcher_b6406c84 started and ready for tasks
+2025-07-23 16:15:08 - agent.researcher_b6406c84 - [researcher_b6406c84] - INFO - Agent researcher_b6406c84 stopped successfully
+2025-07-23 16:15:14 - agent.researcher_4086ff24 - [researcher_4086ff24] - INFO - Initializing researcher agent: researcher_4086ff24
+2025-07-23 16:15:14 - agent.researcher_4086ff24 - [researcher_4086ff24] - DEBUG - Memory management initialized
+2025-07-23 16:15:14 - agent.researcher_4086ff24 - [researcher_4086ff24] - DEBUG - Communication system initialized
+2025-07-23 16:15:14 - agent.researcher_4086ff24 - [researcher_4086ff24] - DEBUG - LLM integration initialized successfully
+2025-07-23 16:15:14 - agent.researcher_4086ff24 - [researcher_4086ff24] - INFO - Agent researcher_4086ff24 initialized successfully
+2025-07-23 16:15:14 - agent.researcher_4086ff24 - [researcher_4086ff24] - INFO - Agent initialized with 3 tools
+2025-07-23 16:15:14 - agent.researcher_4086ff24 - [researcher_4086ff24] - INFO - Researcher agent initialized: researcher_4086ff24
+2025-07-23 16:15:14 - agent.researcher_4086ff24 - [researcher_4086ff24] - INFO - Agent researcher_4086ff24 started and ready for tasks
+2025-07-23 16:15:14 - agent.researcher_4086ff24 - [researcher_4086ff24] - INFO - Starting task execution: task_1753287314
+2025-07-23 16:15:14 - agent.researcher_4086ff24 - [researcher_4086ff24] - INFO - Task started: test_ee1c1937
+2025-07-23 16:15:14 - agent.researcher_4086ff24 - [researcher_4086ff24] - WARNING - Performance: research_web_research failed after 0.00s
+2025-07-23 16:15:14 - agent.researcher_4086ff24 - [researcher_4086ff24] - ERROR - Task failed: test_ee1c1937
+2025-07-23 16:15:14 - agent.researcher_4086ff24 - [researcher_4086ff24] - WARNING - Retry attempt 1 for task task_1753287314: Research query is required
+2025-07-23 16:15:15 - agent.researcher_4086ff24 - [researcher_4086ff24] - INFO - Task started: test_ee1c1937
+2025-07-23 16:15:15 - agent.researcher_4086ff24 - [researcher_4086ff24] - WARNING - Performance: research_web_research failed after 0.00s
+2025-07-23 16:15:15 - agent.researcher_4086ff24 - [researcher_4086ff24] - ERROR - Task failed: test_ee1c1937
+2025-07-23 16:15:15 - agent.researcher_4086ff24 - [researcher_4086ff24] - WARNING - Retry attempt 2 for task task_1753287314: Research query is required
+2025-07-23 16:15:17 - agent.researcher_4086ff24 - [researcher_4086ff24] - INFO - Task started: test_ee1c1937
+2025-07-23 16:15:17 - agent.researcher_4086ff24 - [researcher_4086ff24] - WARNING - Performance: research_web_research failed after 0.00s
+2025-07-23 16:15:17 - agent.researcher_4086ff24 - [researcher_4086ff24] - ERROR - Task failed: test_ee1c1937
+2025-07-23 16:15:17 - agent.researcher_4086ff24 - [researcher_4086ff24] - WARNING - Retry attempt 3 for task task_1753287314: Research query is required
+2025-07-23 16:15:21 - agent.researcher_4086ff24 - [researcher_4086ff24] - INFO - Task started: test_ee1c1937
+2025-07-23 16:15:21 - agent.researcher_4086ff24 - [researcher_4086ff24] - WARNING - Performance: research_web_research failed after 0.00s
+2025-07-23 16:15:21 - agent.researcher_4086ff24 - [researcher_4086ff24] - ERROR - Task failed: test_ee1c1937
+2025-07-23 16:15:21 - agent.researcher_4086ff24 - [researcher_4086ff24] - WARNING - Retry attempt 4 for task task_1753287314: Research query is required
+2025-07-23 16:15:30 - agent.researcher_4086ff24 - [researcher_4086ff24] - INFO - Task started: test_ee1c1937
+2025-07-23 16:15:30 - agent.researcher_4086ff24 - [researcher_4086ff24] - WARNING - Performance: research_web_research failed after 0.00s
+2025-07-23 16:15:30 - agent.researcher_4086ff24 - [researcher_4086ff24] - ERROR - Task failed: test_ee1c1937
+2025-07-23 16:15:30 - agent.researcher_4086ff24 - [researcher_4086ff24] - WARNING - Retry attempt 5 for task task_1753287314: Research query is required
+2025-07-23 16:15:46 - agent.researcher_4086ff24 - [researcher_4086ff24] - INFO - Task started: test_ee1c1937
+2025-07-23 16:15:46 - agent.researcher_4086ff24 - [researcher_4086ff24] - WARNING - Performance: research_web_research failed after 0.00s
+2025-07-23 16:15:46 - agent.researcher_4086ff24 - [researcher_4086ff24] - ERROR - Task failed: test_ee1c1937
+2025-07-23 16:15:46 - agent.researcher_4086ff24 - [researcher_4086ff24] - ERROR - Task failed: task_1753287314 - Function failed after 6 attempts. Last error: Research query is required
+2025-07-23 16:16:19 - agent.researcher_48932c84 - [researcher_48932c84] - INFO - Initializing researcher agent: researcher_48932c84
+2025-07-23 16:16:19 - agent.researcher_48932c84 - [researcher_48932c84] - DEBUG - Memory management initialized
+2025-07-23 16:16:19 - agent.researcher_48932c84 - [researcher_48932c84] - DEBUG - Communication system initialized
+2025-07-23 16:16:19 - agent.researcher_48932c84 - [researcher_48932c84] - DEBUG - LLM integration initialized successfully
+2025-07-23 16:16:19 - agent.researcher_48932c84 - [researcher_48932c84] - INFO - Agent researcher_48932c84 initialized successfully
+2025-07-23 16:16:19 - agent.researcher_48932c84 - [researcher_48932c84] - INFO - Agent initialized with 3 tools
+2025-07-23 16:16:19 - agent.researcher_48932c84 - [researcher_48932c84] - INFO - Researcher agent initialized: researcher_48932c84
+2025-07-23 16:16:19 - agent.researcher_48932c84 - [researcher_48932c84] - INFO - Agent researcher_48932c84 started and ready for tasks
+2025-07-23 16:16:19 - agent.researcher_48932c84 - [researcher_48932c84] - INFO - Starting task execution: task_1753287379
+2025-07-23 16:16:19 - agent.researcher_48932c84 - [researcher_48932c84] - INFO - Task started: test_fa5c36e8
+2025-07-23 16:16:19 - agent.researcher_48932c84 - [researcher_48932c84] - INFO - Starting research task: Test research task about AI trends
+2025-07-23 16:16:19 - agent.researcher_48932c84 - [researcher_48932c84] - INFO - Performing web research for: Test research task about AI trends
+2025-07-23 16:16:35 - agent.researcher_48932c84 - [researcher_48932c84] - ERROR - LLM response generation failed: llm.groq_client.GroqLLMClient.chat_completion() got multiple values for keyword argument 'temperature'
+2025-07-23 16:16:35 - agent.researcher_48932c84 - [researcher_48932c84] - WARNING - Performance: research_web_research failed after 15.73s
+2025-07-23 16:16:35 - agent.researcher_48932c84 - [researcher_48932c84] - ERROR - Task failed: test_fa5c36e8
+2025-07-23 16:16:35 - agent.researcher_48932c84 - [researcher_48932c84] - WARNING - Retry attempt 1 for task task_1753287379: LLM generation failed: llm.groq_client.GroqLLMClient.chat_completion() got multiple values for keyword argument 'temperature'
+2025-07-23 16:16:36 - agent.researcher_48932c84 - [researcher_48932c84] - INFO - Task started: test_fa5c36e8
+2025-07-23 16:16:36 - agent.researcher_48932c84 - [researcher_48932c84] - INFO - Starting research task: Test research task about AI trends
+2025-07-23 16:16:36 - agent.researcher_48932c84 - [researcher_48932c84] - INFO - Performing web research for: Test research task about AI trends
+2025-07-23 16:16:51 - agent.researcher_48932c84 - [researcher_48932c84] - ERROR - LLM response generation failed: llm.groq_client.GroqLLMClient.chat_completion() got multiple values for keyword argument 'temperature'
+2025-07-23 16:16:51 - agent.researcher_48932c84 - [researcher_48932c84] - WARNING - Performance: research_web_research failed after 14.64s
+2025-07-23 16:16:51 - agent.researcher_48932c84 - [researcher_48932c84] - ERROR - Task failed: test_fa5c36e8
+2025-07-23 16:16:51 - agent.researcher_48932c84 - [researcher_48932c84] - WARNING - Retry attempt 2 for task task_1753287379: LLM generation failed: llm.groq_client.GroqLLMClient.chat_completion() got multiple values for keyword argument 'temperature'
+2025-07-23 16:16:53 - agent.researcher_48932c84 - [researcher_48932c84] - INFO - Task started: test_fa5c36e8
+2025-07-23 16:16:53 - agent.researcher_48932c84 - [researcher_48932c84] - INFO - Starting research task: Test research task about AI trends
+2025-07-23 16:16:53 - agent.researcher_48932c84 - [researcher_48932c84] - INFO - Performing web research for: Test research task about AI trends
+2025-07-23 16:17:08 - agent.researcher_48932c84 - [researcher_48932c84] - ERROR - LLM response generation failed: llm.groq_client.GroqLLMClient.chat_completion() got multiple values for keyword argument 'temperature'
+2025-07-23 16:17:08 - agent.researcher_48932c84 - [researcher_48932c84] - WARNING - Performance: research_web_research failed after 15.04s
+2025-07-23 16:17:08 - agent.researcher_48932c84 - [researcher_48932c84] - ERROR - Task failed: test_fa5c36e8
+2025-07-23 16:17:08 - agent.researcher_48932c84 - [researcher_48932c84] - WARNING - Retry attempt 3 for task task_1753287379: LLM generation failed: llm.groq_client.GroqLLMClient.chat_completion() got multiple values for keyword argument 'temperature'
+2025-07-23 16:17:12 - agent.researcher_48932c84 - [researcher_48932c84] - INFO - Task started: test_fa5c36e8
+2025-07-23 16:17:12 - agent.researcher_48932c84 - [researcher_48932c84] - INFO - Starting research task: Test research task about AI trends
+2025-07-23 16:17:12 - agent.researcher_48932c84 - [researcher_48932c84] - INFO - Performing web research for: Test research task about AI trends
+2025-07-23 16:17:26 - agent.researcher_48932c84 - [researcher_48932c84] - ERROR - LLM response generation failed: llm.groq_client.GroqLLMClient.chat_completion() got multiple values for keyword argument 'temperature'
+2025-07-23 16:17:26 - agent.researcher_48932c84 - [researcher_48932c84] - WARNING - Performance: research_web_research failed after 14.50s
+2025-07-23 16:17:26 - agent.researcher_48932c84 - [researcher_48932c84] - ERROR - Task failed: test_fa5c36e8
+2025-07-23 16:17:26 - agent.researcher_48932c84 - [researcher_48932c84] - WARNING - Retry attempt 4 for task task_1753287379: LLM generation failed: llm.groq_client.GroqLLMClient.chat_completion() got multiple values for keyword argument 'temperature'
+2025-07-23 16:17:34 - agent.researcher_48932c84 - [researcher_48932c84] - INFO - Task started: test_fa5c36e8
+2025-07-23 16:17:34 - agent.researcher_48932c84 - [researcher_48932c84] - INFO - Starting research task: Test research task about AI trends
+2025-07-23 16:17:34 - agent.researcher_48932c84 - [researcher_48932c84] - INFO - Performing web research for: Test research task about AI trends
+2025-07-23 16:17:48 - agent.researcher_48932c84 - [researcher_48932c84] - ERROR - LLM response generation failed: llm.groq_client.GroqLLMClient.chat_completion() got multiple values for keyword argument 'temperature'
+2025-07-23 16:17:48 - agent.researcher_48932c84 - [researcher_48932c84] - WARNING - Performance: research_web_research failed after 14.22s
+2025-07-23 16:17:48 - agent.researcher_48932c84 - [researcher_48932c84] - ERROR - Task failed: test_fa5c36e8
+2025-07-23 16:17:48 - agent.researcher_48932c84 - [researcher_48932c84] - WARNING - Retry attempt 5 for task task_1753287379: LLM generation failed: llm.groq_client.GroqLLMClient.chat_completion() got multiple values for keyword argument 'temperature'
+2025-07-23 16:18:04 - agent.researcher_48932c84 - [researcher_48932c84] - INFO - Task started: test_fa5c36e8
+2025-07-23 16:18:04 - agent.researcher_48932c84 - [researcher_48932c84] - INFO - Starting research task: Test research task about AI trends
+2025-07-23 16:18:04 - agent.researcher_48932c84 - [researcher_48932c84] - INFO - Performing web research for: Test research task about AI trends
+2025-07-23 16:18:19 - agent.researcher_48932c84 - [researcher_48932c84] - ERROR - LLM response generation failed: llm.groq_client.GroqLLMClient.chat_completion() got multiple values for keyword argument 'temperature'
+2025-07-23 16:18:19 - agent.researcher_48932c84 - [researcher_48932c84] - WARNING - Performance: research_web_research failed after 14.62s
+2025-07-23 16:18:19 - agent.researcher_48932c84 - [researcher_48932c84] - ERROR - Task failed: test_fa5c36e8
+2025-07-23 16:18:19 - agent.researcher_48932c84 - [researcher_48932c84] - ERROR - Task failed: task_1753287379 - Function failed after 6 attempts. Last error: LLM generation failed: llm.groq_client.GroqLLMClient.chat_completion() got multiple values for keyword argument 'temperature'
+2025-07-23 16:18:20 - agent.researcher_1867e890 - [researcher_1867e890] - INFO - Initializing researcher agent: researcher_1867e890
+2025-07-23 16:18:20 - agent.researcher_1867e890 - [researcher_1867e890] - DEBUG - Memory management initialized
+2025-07-23 16:18:20 - agent.researcher_1867e890 - [researcher_1867e890] - DEBUG - Communication system initialized
+2025-07-23 16:18:20 - agent.researcher_1867e890 - [researcher_1867e890] - DEBUG - LLM integration initialized successfully
+2025-07-23 16:18:20 - agent.researcher_1867e890 - [researcher_1867e890] - INFO - Agent researcher_1867e890 initialized successfully
+2025-07-23 16:18:20 - agent.researcher_1867e890 - [researcher_1867e890] - INFO - Agent initialized with 3 tools
+2025-07-23 16:18:20 - agent.researcher_1867e890 - [researcher_1867e890] - INFO - Researcher agent initialized: researcher_1867e890
+2025-07-23 16:18:20 - agent.researcher_1867e890 - [researcher_1867e890] - INFO - Agent researcher_1867e890 started and ready for tasks
+2025-07-23 16:18:21 - agent.researcher_1867e890 - [researcher_1867e890] - INFO - Agent researcher_1867e890 stopped successfully
+2025-07-23 16:18:21 - agent.researcher_5bd9ebc2 - [researcher_5bd9ebc2] - INFO - Initializing researcher agent: researcher_5bd9ebc2
+2025-07-23 16:18:21 - agent.researcher_5bd9ebc2 - [researcher_5bd9ebc2] - DEBUG - Memory management initialized
+2025-07-23 16:18:21 - agent.researcher_5bd9ebc2 - [researcher_5bd9ebc2] - DEBUG - Communication system initialized
+2025-07-23 16:18:21 - agent.researcher_5bd9ebc2 - [researcher_5bd9ebc2] - DEBUG - LLM integration initialized successfully
+2025-07-23 16:18:21 - agent.researcher_5bd9ebc2 - [researcher_5bd9ebc2] - INFO - Agent researcher_5bd9ebc2 initialized successfully
+2025-07-23 16:18:21 - agent.researcher_5bd9ebc2 - [researcher_5bd9ebc2] - INFO - Agent initialized with 3 tools
+2025-07-23 16:18:21 - agent.researcher_5bd9ebc2 - [researcher_5bd9ebc2] - INFO - Researcher agent initialized: researcher_5bd9ebc2
+2025-07-23 16:18:21 - agent.researcher_5bd9ebc2 - [researcher_5bd9ebc2] - INFO - Agent researcher_5bd9ebc2 started and ready for tasks
+2025-07-23 16:18:21 - agent.researcher_5bd9ebc2 - [researcher_5bd9ebc2] - INFO - Starting task execution: task_1753287501
+2025-07-23 16:18:21 - agent.researcher_5bd9ebc2 - [researcher_5bd9ebc2] - INFO - Task started: test_135158c0
+2025-07-23 16:18:21 - agent.researcher_5bd9ebc2 - [researcher_5bd9ebc2] - INFO - Starting research task: Test task
+2025-07-23 16:18:21 - agent.researcher_5bd9ebc2 - [researcher_5bd9ebc2] - INFO - Performing comprehensive research: Test task (scope: broad)
+2025-07-23 16:18:36 - agent.researcher_5bd9ebc2 - [researcher_5bd9ebc2] - INFO - Performing web research for: Test task
+2025-07-23 16:18:52 - agent.researcher_5bd9ebc2 - [researcher_5bd9ebc2] - ERROR - LLM response generation failed: llm.groq_client.GroqLLMClient.chat_completion() got multiple values for keyword argument 'temperature'
+2025-07-23 16:18:52 - agent.researcher_5bd9ebc2 - [researcher_5bd9ebc2] - WARNING - Web research phase failed: LLM generation failed: llm.groq_client.GroqLLMClient.chat_completion() got multiple values for keyword argument 'temperature'
+2025-07-23 16:18:52 - agent.researcher_5bd9ebc2 - [researcher_5bd9ebc2] - WARNING - Synthesis phase failed: sequence item 0: expected str instance, dict found
+2025-07-23 16:19:07 - agent.researcher_5bd9ebc2 - [researcher_5bd9ebc2] - INFO - Performance: research_test completed in 46.61s
+2025-07-23 16:19:07 - agent.researcher_5bd9ebc2 - [researcher_5bd9ebc2] - INFO - Task completed: test_135158c0
+2025-07-23 16:19:07 - agent.researcher_5bd9ebc2 - [researcher_5bd9ebc2] - INFO - Task completed successfully: task_1753287501
+2025-07-23 16:19:07 - agent.researcher_5bd9ebc2 - [researcher_5bd9ebc2] - INFO - Agent researcher_5bd9ebc2 stopped successfully
+2025-07-23 16:19:40 - agent.researcher_fef71a9a - [researcher_fef71a9a] - INFO - Initializing researcher agent: researcher_fef71a9a
+2025-07-23 16:19:40 - agent.researcher_fef71a9a - [researcher_fef71a9a] - DEBUG - Memory management initialized
+2025-07-23 16:19:40 - agent.researcher_fef71a9a - [researcher_fef71a9a] - DEBUG - Communication system initialized
+2025-07-23 16:19:40 - agent.researcher_fef71a9a - [researcher_fef71a9a] - DEBUG - LLM integration initialized successfully
+2025-07-23 16:19:40 - agent.researcher_fef71a9a - [researcher_fef71a9a] - INFO - Agent researcher_fef71a9a initialized successfully
+2025-07-23 16:19:40 - agent.researcher_fef71a9a - [researcher_fef71a9a] - INFO - Agent initialized with 3 tools
+2025-07-23 16:19:40 - agent.researcher_fef71a9a - [researcher_fef71a9a] - INFO - Researcher agent initialized: researcher_fef71a9a
+2025-07-23 16:19:40 - agent.researcher_fef71a9a - [researcher_fef71a9a] - INFO - Agent researcher_fef71a9a started and ready for tasks
+2025-07-23 16:19:40 - agent.researcher_fef71a9a - [researcher_fef71a9a] - INFO - Agent researcher_fef71a9a stopped successfully
+2025-07-23 16:19:48 - agent.researcher_da5e62e3 - [researcher_da5e62e3] - INFO - Initializing researcher agent: researcher_da5e62e3
+2025-07-23 16:19:48 - agent.researcher_da5e62e3 - [researcher_da5e62e3] - DEBUG - Memory management initialized
+2025-07-23 16:19:48 - agent.researcher_da5e62e3 - [researcher_da5e62e3] - DEBUG - Communication system initialized
+2025-07-23 16:19:48 - agent.researcher_da5e62e3 - [researcher_da5e62e3] - DEBUG - LLM integration initialized successfully
+2025-07-23 16:19:48 - agent.researcher_da5e62e3 - [researcher_da5e62e3] - INFO - Agent researcher_da5e62e3 initialized successfully
+2025-07-23 16:19:48 - agent.researcher_da5e62e3 - [researcher_da5e62e3] - INFO - Agent initialized with 3 tools
+2025-07-23 16:19:48 - agent.researcher_da5e62e3 - [researcher_da5e62e3] - INFO - Researcher agent initialized: researcher_da5e62e3
+2025-07-23 16:19:48 - agent.researcher_da5e62e3 - [researcher_da5e62e3] - INFO - Agent researcher_da5e62e3 started and ready for tasks
+2025-07-23 16:19:48 - agent.researcher_da5e62e3 - [researcher_da5e62e3] - INFO - Starting task execution: task_1753287588
+2025-07-23 16:19:48 - agent.researcher_da5e62e3 - [researcher_da5e62e3] - INFO - Task started: test_dbe1a8f1
+2025-07-23 16:19:48 - agent.researcher_da5e62e3 - [researcher_da5e62e3] - INFO - Starting research task: Just say hello
+2025-07-23 16:19:48 - agent.researcher_da5e62e3 - [researcher_da5e62e3] - INFO - Performing comprehensive research: Just say hello (scope: broad)
+2025-07-23 16:20:05 - agent.researcher_da5e62e3 - [researcher_da5e62e3] - INFO - Performing web research for: Just say hello
+2025-07-23 16:20:20 - agent.researcher_da5e62e3 - [researcher_da5e62e3] - ERROR - LLM response generation failed: llm.groq_client.GroqLLMClient.chat_completion() got multiple values for keyword argument 'temperature'
+2025-07-23 16:20:20 - agent.researcher_da5e62e3 - [researcher_da5e62e3] - WARNING - Web research phase failed: LLM generation failed: llm.groq_client.GroqLLMClient.chat_completion() got multiple values for keyword argument 'temperature'
+2025-07-23 16:20:20 - agent.researcher_da5e62e3 - [researcher_da5e62e3] - WARNING - Synthesis phase failed: sequence item 0: expected str instance, dict found
+2025-07-23 16:20:36 - agent.researcher_da5e62e3 - [researcher_da5e62e3] - INFO - Performance: research_quick_response completed in 47.78s
+2025-07-23 16:20:36 - agent.researcher_da5e62e3 - [researcher_da5e62e3] - INFO - Task completed: test_dbe1a8f1
+2025-07-23 16:20:36 - agent.researcher_da5e62e3 - [researcher_da5e62e3] - INFO - Task completed successfully: task_1753287588
+2025-07-23 16:20:36 - agent.researcher_da5e62e3 - [researcher_da5e62e3] - INFO - Agent researcher_da5e62e3 stopped successfully
+2025-07-23 16:21:21 - agent.researcher_81a14028 - [researcher_81a14028] - INFO - Initializing researcher agent: researcher_81a14028
+2025-07-23 16:21:21 - agent.researcher_81a14028 - [researcher_81a14028] - DEBUG - Memory management initialized
+2025-07-23 16:21:21 - agent.researcher_81a14028 - [researcher_81a14028] - DEBUG - Communication system initialized
+2025-07-23 16:21:21 - agent.researcher_81a14028 - [researcher_81a14028] - DEBUG - LLM integration initialized successfully
+2025-07-23 16:21:21 - agent.researcher_81a14028 - [researcher_81a14028] - INFO - Agent researcher_81a14028 initialized successfully
+2025-07-23 16:21:21 - agent.researcher_81a14028 - [researcher_81a14028] - INFO - Agent initialized with 3 tools
+2025-07-23 16:21:21 - agent.researcher_81a14028 - [researcher_81a14028] - INFO - Researcher agent initialized: researcher_81a14028
+2025-07-23 16:21:21 - agent.researcher_81a14028 - [researcher_81a14028] - INFO - Agent researcher_81a14028 started and ready for tasks
+2025-07-23 16:21:21 - agent.researcher_81a14028 - [researcher_81a14028] - INFO - Agent researcher_81a14028 stopped successfully
+2025-07-23 16:21:21 - agent.researcher_d23d21ac - [researcher_d23d21ac] - INFO - Initializing researcher agent: researcher_d23d21ac
+2025-07-23 16:21:21 - agent.researcher_d23d21ac - [researcher_d23d21ac] - DEBUG - Memory management initialized
+2025-07-23 16:21:21 - agent.researcher_d23d21ac - [researcher_d23d21ac] - DEBUG - Communication system initialized
+2025-07-23 16:21:21 - agent.researcher_d23d21ac - [researcher_d23d21ac] - DEBUG - LLM integration initialized successfully
+2025-07-23 16:21:21 - agent.researcher_d23d21ac - [researcher_d23d21ac] - INFO - Agent researcher_d23d21ac initialized successfully
+2025-07-23 16:21:21 - agent.researcher_d23d21ac - [researcher_d23d21ac] - INFO - Agent initialized with 3 tools
+2025-07-23 16:21:21 - agent.researcher_d23d21ac - [researcher_d23d21ac] - INFO - Researcher agent initialized: researcher_d23d21ac
+2025-07-23 16:21:21 - agent.researcher_d23d21ac - [researcher_d23d21ac] - INFO - Agent researcher_d23d21ac started and ready for tasks
+2025-07-23 16:21:21 - agent.researcher_d23d21ac - [researcher_d23d21ac] - INFO - Agent researcher_d23d21ac stopped successfully

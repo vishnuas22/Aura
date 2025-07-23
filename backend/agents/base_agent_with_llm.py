@@ -325,7 +325,7 @@ class LLMEnabledAgent(BaseAIAgent):
     
     def _get_system_prompt(self) -> str:
         """Get system prompt for the agent."""
-        base_prompt = f"""You are a {self.config.role}. {self.config.backstory}
+        system_prompt = f"""You are a {self.config.role}. {self.config.backstory}
 
 Your goal is: {self.config.goal}
 
@@ -333,7 +333,7 @@ Please provide helpful, accurate, and professional responses that align with you
         
         # Add agent-specific instructions
         if self.agent_type == "researcher":
-            base_prompt += """
+            system_prompt += """
 
 Focus on:
 - Gathering accurate and credible information
@@ -342,7 +342,7 @@ Focus on:
 - Maintaining objectivity and citing sources when possible"""
             
         elif self.agent_type == "analyst":
-            base_prompt += """
+            system_prompt += """
 
 Focus on:
 - Analyzing data and identifying patterns
@@ -351,7 +351,7 @@ Focus on:
 - Presenting balanced and evidence-based conclusions"""
             
         elif self.agent_type == "writer":
-            base_prompt += """
+            system_prompt += """
 
 Focus on:
 - Creating well-structured and engaging content
@@ -359,7 +359,7 @@ Focus on:
 - Ensuring clarity and readability
 - Following proper grammar and formatting conventions"""
         
-        return base_prompt
+        return system_prompt
     
     async def get_llm_health_status(self) -> Dict[str, Any]:
         """Get LLM integration health status."""

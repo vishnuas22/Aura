@@ -6,17 +6,19 @@ import os
 import yaml
 from typing import Dict, Any, Optional
 from pathlib import Path
+from dataclasses import dataclass
 from pydantic import BaseModel, Field
 from .exceptions import ConfigurationException
 
 
-class ModelConfig(BaseModel):
+@dataclass
+class ModelConfig:
     """Configuration for LLM models."""
-    name: str = Field(..., description="Model name")
-    provider: str = Field(..., description="Model provider")
-    temperature: float = Field(default=0.3, ge=0.0, le=2.0)
-    max_tokens: int = Field(default=4000, gt=0)
-    timeout: int = Field(default=300, gt=0)
+    name: str
+    provider: str
+    temperature: float = 0.3
+    max_tokens: int = 4000
+    timeout: int = 300
 
 
 class LLMConfig(BaseModel):
@@ -34,7 +36,7 @@ class AgentConfig(BaseModel):
     role: str = Field(..., description="Agent role")
     backstory: str = Field(..., description="Agent backstory")
     goal: str = Field(..., description="Agent goal")
-    model_config: ModelConfig
+    model_settings: ModelConfig
     llm_config: LLMConfig = Field(default_factory=LLMConfig)
     tools: list[str] = Field(default_factory=list)
     max_retries: int = Field(default=3, ge=0)
@@ -146,7 +148,7 @@ class ConfigManager:
         global_config = config.get('global', {})
         
         # Build model configuration
-        model_config = ModelConfig(
+        model_settings = ModelConfig(
             name=agent_data.get('llm', {}).get('model', global_config.get('default_model')),
             provider="groq",
             temperature=agent_data.get('llm', {}).get('temperature', global_config.get('analytical_temperature', 0.3)),
@@ -168,7 +170,7 @@ class ConfigManager:
             role=agent_data['role'],
             backstory=agent_data['backstory'],
             goal=agent_data['goal'],
-            model_config=model_config,
+            model_settings=model_settings,
             llm_config=llm_config,
             tools=agent_data.get('tools', []),
             max_retries=agent_data.get('limits', {}).get('max_iterations', 3),

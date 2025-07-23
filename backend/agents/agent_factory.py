@@ -11,10 +11,10 @@ from .base_agent import BaseAIAgent
 from .researcher_agent import ResearcherAgent
 from .analyst_agent import AnalystAgent
 from .writer_agent import WriterAgent
-from ..core.config import ConfigManager, AgentConfig
-from ..core.exceptions import ConfigurationException, AgentException
-from ..memory.agent_memory import create_memory_store
-from ..tools.agent_tools import get_tools_for_agent
+from core.config import ConfigManager, AgentConfig
+from core.exceptions import ConfigurationException, AgentException
+from memory.agent_memory import create_memory_store
+from tools.agent_tools import get_tools_for_agent
 
 
 class AgentType(Enum):

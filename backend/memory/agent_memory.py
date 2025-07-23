@@ -11,8 +11,8 @@ from abc import ABC, abstractmethod
 import asyncio
 from motor.motor_asyncio import AsyncIOMotorCollection
 
-from ..core.exceptions import MemoryException
-from ..core.config import MemoryConfig
+from core.exceptions import MemoryException
+from core.config import MemoryConfig
 
 
 @dataclass

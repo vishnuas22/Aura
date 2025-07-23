@@ -16,8 +16,8 @@ import tiktoken
 from groq import AsyncGroq
 from groq.types.chat import ChatCompletion
 
-from ..core.exceptions import ModelException
-from ..utils.retry import RetryHandler
+from core.exceptions import ModelException
+from utils.retry import RetryHandler
 
 
 class GroqModel(Enum):

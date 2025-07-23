@@ -8,10 +8,10 @@ from typing import Dict, Any, List, Optional
 from datetime import datetime
 
 from .base_agent import BaseAIAgent
-from ..core.config import AgentConfig
-from ..core.exceptions import AgentException
-from ..tools.agent_tools import get_tools_for_agent
-from ..utils.logging_utils import log_agent_performance, log_agent_task
+from core.config import AgentConfig
+from core.exceptions import AgentException
+from tools.agent_tools import get_tools_for_agent
+from utils.logging_utils import log_agent_performance, log_agent_task
 
 
 class ResearcherAgent(BaseAIAgent):
@@ -84,13 +84,13 @@ class ResearcherAgent(BaseAIAgent):
             log_agent_task(self.logger, self.agent_id, task_data.get("id", "unknown"), "started")
             
             # Extract task parameters
-            research_query = task_data.get("query", "")
+            research_query = task_data.get("query", task_data.get("description", ""))
             research_scope = task_data.get("scope", "broad")
             max_sources = task_data.get("max_sources", self.max_search_results)
             required_credibility = task_data.get("credibility_threshold", self.source_credibility_threshold)
             
             if not research_query:
-                raise AgentException("Research query is required", error_code="MISSING_QUERY")
+                raise AgentException("Research query or description is required", error_code="MISSING_QUERY")
             
             self.logger.info(f"Starting research task: {research_query}")
             

@@ -8,7 +8,7 @@ import time
 from typing import Any, Callable, Optional, Type, Union, List
 from functools import wraps
 
-from ..core.exceptions import AgentRetryExhaustedException
+from core.exceptions import AgentRetryExhaustedException
 
 
 class RetryHandler:

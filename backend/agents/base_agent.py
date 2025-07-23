@@ -10,22 +10,22 @@ from typing import Dict, Any, List, Optional, Union, Callable
 from datetime import datetime
 import uuid
 
-from crewai import Agent, LLM
-from langchain_groq import ChatGroq
+# from crewai import Agent, LLM
+# from langchain_groq import ChatGroq
 
-from ..core.config import AgentConfig, ConfigManager
-from ..core.exceptions import (
+from core.config import AgentConfig, ConfigManager
+from core.exceptions import (
     AgentException, AgentTimeoutException, AgentRetryExhaustedException, ModelException
 )
-from ..core.metrics import get_metrics_collector, MetricsCollector
-from ..core.communication import (
+from core.metrics import get_metrics_collector, MetricsCollector
+from core.communication import (
     AgentCommunicator, MessageHandler, AgentMessage, MessageType,
     get_communication_channel, DefaultMessageHandler
 )
-from ..memory.agent_memory import AgentMemoryManager, create_memory_store
-from ..utils.retry import RetryHandler
-from ..utils.logging_utils import get_agent_logger
-from ..llm import LLMIntegration, get_llm_client, initialize_llm_client, GroqModel
+from memory.agent_memory import AgentMemoryManager, create_memory_store
+from utils.retry import RetryHandler
+from utils.logging_utils import get_agent_logger
+from llm import LLMIntegration, get_llm_client, initialize_llm_client, GroqModel
 
 
 class BaseAIAgent(ABC):
@@ -93,8 +93,10 @@ class BaseAIAgent(ABC):
         self._init_llm_integration()
         
         # CrewAI agent (initialized in subclass)
-        self._crew_agent: Optional[Agent] = None
-        self._llm: Optional[LLM] = None
+        # self._crew_agent: Optional[Agent] = None
+        # self._llm: Optional[LLM] = None
+        self._crew_agent = None
+        self._llm = None
         
         # State tracking
         self._current_task_id: Optional[str] = None
@@ -171,37 +173,16 @@ class BaseAIAgent(ABC):
         return AgentMessageHandler(self)
     
     def _init_crew_agent(self, tools: Optional[List[Any]] = None) -> None:
-        """Initialize the CrewAI agent."""
+        """Initialize the agent (simplified version without CrewAI)."""
         try:
-            # Initialize LLM
-            self._llm = ChatGroq(
-                model_name=self.config.model_config.name,
-                temperature=self.config.model_config.temperature,
-                max_tokens=self.config.model_config.max_tokens,
-                timeout=self.config.model_config.timeout,
-                groq_api_key=ConfigManager().get_system_config().groq_api_key
-            )
-            
             # Store tools
             self._tools = tools or []
             
-            # Create CrewAI agent
-            self._crew_agent = Agent(
-                role=self.config.role,
-                goal=self.config.goal,
-                backstory=self.config.backstory,
-                llm=self._llm,
-                tools=self._tools,
-                verbose=self.config.verbose,
-                memory=True,
-                max_retry_limit=self.config.max_retries
-            )
-            
-            self.logger.info(f"CrewAI agent initialized with {len(self._tools)} tools")
+            self.logger.info(f"Agent initialized with {len(self._tools)} tools")
             
         except Exception as e:
-            self.logger.error(f"Failed to initialize CrewAI agent: {e}")
-            raise AgentException(f"CrewAI agent initialization failed: {str(e)}")
+            self.logger.error(f"Failed to initialize agent: {e}")
+            raise AgentException(f"Agent initialization failed: {str(e)}")
     
     @abstractmethod
     async def process_task(self, task_data: Dict[str, Any]) -> Dict[str, Any]:
