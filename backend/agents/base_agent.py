@@ -15,7 +15,7 @@ from langchain_groq import ChatGroq
 
 from ..core.config import AgentConfig, ConfigManager
 from ..core.exceptions import (
-    AgentException, AgentTimeoutException, AgentRetryExhaustedException
+    AgentException, AgentTimeoutException, AgentRetryExhaustedException, ModelException
 )
 from ..core.metrics import get_metrics_collector, MetricsCollector
 from ..core.communication import (
@@ -25,6 +25,7 @@ from ..core.communication import (
 from ..memory.agent_memory import AgentMemoryManager, create_memory_store
 from ..utils.retry import RetryHandler
 from ..utils.logging_utils import get_agent_logger
+from ..llm import LLMIntegration, get_llm_client, initialize_llm_client, GroqModel
 
 
 class BaseAIAgent(ABC):
@@ -87,6 +88,9 @@ class BaseAIAgent(ABC):
             backoff_factor=2.0,
             max_wait_time=60.0
         )
+
+        # Initialize LLM integration
+        self._init_llm_integration()
         
         # CrewAI agent (initialized in subclass)
         self._crew_agent: Optional[Agent] = None
@@ -97,6 +101,10 @@ class BaseAIAgent(ABC):
         self._execution_id: Optional[str] = None
         self._is_busy = False
         self._tools: List[Any] = []
+        
+        # LLM-specific attributes
+        self._conversation_context: List[Dict[str, str]] = []
+        self._max_context_length = 10
         
         self.logger.info(f"Agent {self.agent_id} initialized successfully")
     
@@ -135,6 +143,28 @@ class BaseAIAgent(ABC):
         except Exception as e:
             self.logger.error(f"Failed to initialize communication: {e}")
             raise AgentException(f"Communication initialization failed: {str(e)}")
+    
+    def _init_llm_integration(self) -> None:
+        """Initialize LLM integration."""
+        try:
+            llm_client = get_llm_client()
+            
+            if not llm_client:
+                # Initialize client if not already done
+                system_config = ConfigManager().get_system_config()
+                llm_client = initialize_llm_client(
+                    api_key=system_config.groq_api_key,
+                    default_model=GroqModel.LLAMA_3_1_70B_VERSATILE,
+                    enable_caching=True,
+                    max_retries=3
+                )
+            
+            self.llm = LLMIntegration(llm_client)
+            self.logger.debug("LLM integration initialized successfully")
+            
+        except Exception as e:
+            self.logger.error(f"Failed to initialize LLM integration: {e}")
+            raise AgentException(f"LLM integration failed: {str(e)}")
     
     def _create_message_handler(self) -> MessageHandler:
         """Create a custom message handler for this agent."""
@@ -452,6 +482,266 @@ class BaseAIAgent(ABC):
     def __repr__(self) -> str:
         """String representation of the agent."""
         return f"{self.__class__.__name__}(id={self.agent_id}, type={self.agent_type})"
+    
+    # LLM Integration Methods
+    
+    async def generate_llm_response(
+        self,
+        prompt: str,
+        task_type: Optional[str] = None,
+        complexity: str = "medium",
+        urgency: str = "normal",
+        use_context: bool = True,
+        structured_schema: Optional[Dict[str, Any]] = None,
+        **kwargs
+    ) -> Union[str, Dict[str, Any]]:
+        """
+        Generate LLM response for the agent.
+        
+        Args:
+            prompt: Input prompt
+            task_type: Specific task type
+            complexity: Task complexity (low, medium, high)
+            urgency: Task urgency (low, normal, high)
+            use_context: Whether to include conversation context
+            structured_schema: Schema for structured response
+            **kwargs: Additional parameters
+            
+        Returns:
+            Generated response (string or structured data)
+        """
+        try:
+            # Prepare conversation context
+            messages = []
+            
+            # Add system prompt based on agent type
+            system_prompt = self._get_system_prompt()
+            if system_prompt:
+                messages.append({"role": "system", "content": system_prompt})
+            
+            # Add conversation context if requested
+            if use_context and self._conversation_context:
+                messages.extend(self._conversation_context[-self._max_context_length:])
+            
+            # Add current prompt
+            messages.append({"role": "user", "content": prompt})
+            
+            # Generate response
+            if structured_schema:
+                # Generate structured response
+                response_data = await self.llm.generate_structured_response(
+                    agent_id=self.agent_id,
+                    agent_type=self.agent_type,
+                    prompt=prompt,
+                    response_schema=structured_schema,
+                    task_type=task_type,
+                    complexity=complexity,
+                    urgency=urgency,
+                    **kwargs
+                )
+                
+                # Update conversation context
+                if use_context:
+                    self._update_conversation_context(prompt, str(response_data))
+                
+                return response_data
+            else:
+                # Generate regular response
+                response = await self.llm.generate_response(
+                    agent_id=self.agent_id,
+                    agent_type=self.agent_type,
+                    messages=messages,
+                    task_type=task_type,
+                    complexity=complexity,
+                    urgency=urgency,
+                    **kwargs
+                )
+                
+                response_text = response.content if hasattr(response, 'content') else str(response)
+                
+                # Update conversation context
+                if use_context:
+                    self._update_conversation_context(prompt, response_text)
+                
+                # Store in memory
+                await self.memory.store_conversation(
+                    message=prompt,
+                    role="user",
+                    metadata={
+                        "task_type": task_type,
+                        "complexity": complexity,
+                        "urgency": urgency
+                    }
+                )
+                
+                await self.memory.store_conversation(
+                    message=response_text,
+                    role="assistant",
+                    metadata={
+                        "model": response.model if hasattr(response, 'model') else "unknown",
+                        "tokens_used": response.usage.total_tokens if hasattr(response, 'usage') else 0,
+                        "response_time": response.response_time if hasattr(response, 'response_time') else 0,
+                        "cached": response.cached if hasattr(response, 'cached') else False
+                    }
+                )
+                
+                return response_text
+                
+        except Exception as e:
+            self.logger.error(f"LLM response generation failed: {e}")
+            raise ModelException(f"LLM generation failed: {str(e)}")
+    
+    async def generate_with_memory_context(
+        self,
+        prompt: str,
+        task_type: Optional[str] = None,
+        max_context_items: int = 5,
+        **kwargs
+    ) -> str:
+        """
+        Generate response using relevant memory context.
+        
+        Args:
+            prompt: Input prompt
+            task_type: Specific task type
+            max_context_items: Maximum context items to include
+            **kwargs: Additional parameters
+            
+        Returns:
+            Generated response with context
+        """
+        try:
+            # Get relevant context from memory
+            relevant_context = await self.memory.get_relevant_context(
+                query=prompt,
+                limit=max_context_items
+            )
+            
+            # Format context data
+            context_data = []
+            for item in relevant_context:
+                context_data.append({
+                    "content": item.content.get("insight", item.content.get("message", "")),
+                    "type": item.memory_type,
+                    "importance": item.importance,
+                    "timestamp": item.timestamp.isoformat()
+                })
+            
+            # Generate response with context
+            response = await self.llm.generate_with_context(
+                agent_id=self.agent_id,
+                agent_type=self.agent_type,
+                user_input=prompt,
+                context_data=context_data,
+                task_type=task_type,
+                max_context_items=max_context_items,
+                **kwargs
+            )
+            
+            response_text = response.content if hasattr(response, 'content') else str(response)
+            
+            # Store interaction in memory
+            await self.memory.store_conversation(
+                message=f"Context-aware query: {prompt}",
+                role="user",
+                metadata={
+                    "context_items_used": len(context_data),
+                    "task_type": task_type
+                }
+            )
+            
+            await self.memory.store_conversation(
+                message=response_text,
+                role="assistant",
+                metadata={
+                    "context_enhanced": True,
+                    "model": response.model if hasattr(response, 'model') else "unknown"
+                }
+            )
+            
+            return response_text
+            
+        except Exception as e:
+            self.logger.error(f"Context-aware generation failed: {e}")
+            raise ModelException(f"Context-aware generation failed: {str(e)}")
+    
+    def _update_conversation_context(self, user_message: str, assistant_response: str) -> None:
+        """Update conversation context."""
+        # Add user message
+        self._conversation_context.append({
+            "role": "user",
+            "content": user_message
+        })
+        
+        # Add assistant response
+        self._conversation_context.append({
+            "role": "assistant", 
+            "content": assistant_response
+        })
+        
+        # Trim context if too long
+        max_messages = self._max_context_length * 2  # user + assistant pairs
+        if len(self._conversation_context) > max_messages:
+            self._conversation_context = self._conversation_context[-max_messages:]
+    
+    def _get_system_prompt(self) -> str:
+        """Get system prompt for the agent."""
+        base_prompt = f"""You are a {self.config.role}. {self.config.backstory}
+
+Your goal is: {self.config.goal}
+
+Please provide helpful, accurate, and professional responses that align with your role and expertise."""
+        
+        # Add agent-specific instructions
+        if self.agent_type == "researcher":
+            base_prompt += """
+
+Focus on:
+- Gathering accurate and credible information
+- Verifying facts and sources
+- Providing comprehensive research findings
+- Maintaining objectivity and citing sources when possible"""
+            
+        elif self.agent_type == "analyst":
+            base_prompt += """
+
+Focus on:
+- Analyzing data and identifying patterns
+- Providing strategic insights and recommendations
+- Using analytical frameworks (SWOT, PEST, etc.)
+- Presenting balanced and evidence-based conclusions"""
+            
+        elif self.agent_type == "writer":
+            base_prompt += """
+
+Focus on:
+- Creating well-structured and engaging content
+- Adapting tone and style to the target audience
+- Ensuring clarity and readability
+- Following proper grammar and formatting conventions"""
+        
+        return base_prompt
+    
+    async def get_llm_health_status(self) -> Dict[str, Any]:
+        """Get LLM integration health status."""
+        try:
+            return await self.llm.health_check()
+        except Exception as e:
+            return {
+                "status": "error",
+                "error": str(e),
+                "agent_id": self.agent_id
+            }
+    
+    def clear_conversation_context(self) -> None:
+        """Clear conversation context."""
+        self._conversation_context.clear()
+        self.logger.debug(f"Conversation context cleared for {self.agent_id}")
+    
+    def set_context_length(self, max_length: int) -> None:
+        """Set maximum conversation context length."""
+        self._max_context_length = max(1, min(max_length, 20))  # Reasonable limits
+        self.logger.debug(f"Context length set to {self._max_context_length} for {self.agent_id}")
 
 
 class AgentMessageHandler(MessageHandler):

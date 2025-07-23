@@ -227,41 +227,131 @@ class AnalystAgent(BaseAIAgent):
         """Perform trend analysis on provided data."""
         self.logger.info("Performing trend analysis")
         
-        # Get data analysis tool
-        analysis_tool = next((tool for tool in self._tools if hasattr(tool, 'name') and tool.name == 'data_analysis'), None)
+        # Prepare data summary for LLM analysis
+        data_summary = str(data)[:2000]  # Limit data size for prompt
+        focus_areas_text = ", ".join(focus_areas) if focus_areas else "general trends"
         
-        if not analysis_tool:
-            raise AgentException("Data analysis tool not available", error_code="TOOL_NOT_AVAILABLE")
+        # Use LLM for comprehensive trend analysis
+        trend_analysis_prompt = f"""
+        As a strategic data analyst, perform comprehensive trend analysis on the following data:
         
-        # Execute trend analysis
-        analysis_result = await analysis_tool.execute(data=data, analysis_type="trend_analysis")
+        Data Summary:
+        {data_summary}
         
-        # Process and enhance results
-        trends = self._extract_trends(data, focus_areas)
-        forecasts = self._generate_forecasts(trends)
+        Focus Areas: {focus_areas_text}
         
+        Provide detailed analysis including:
+        1. Key trends identified
+        2. Trend significance and impact
+        3. Directional indicators (increasing, decreasing, stable)
+        4. Time-based patterns
+        5. Potential future projections
+        6. Risk factors and opportunities
+        7. Strategic implications
+        
+        Present findings in a structured analytical format.
+        """
+        
+        trend_analysis = await self.generate_llm_response(
+            prompt=trend_analysis_prompt,
+            task_type="trend_analysis",
+            complexity="high",
+            use_context=True
+        )
+        
+        # Generate specific forecasts using LLM
+        forecast_prompt = f"""
+        Based on the trend analysis, create specific forecasts for each focus area:
+        
+        Trend Analysis Results:
+        {trend_analysis}
+        
+        Focus Areas: {focus_areas_text}
+        
+        For each area, provide:
+        1. Short-term forecast (3-6 months)
+        2. Medium-term forecast (6-12 months)
+        3. Long-term forecast (1-2 years)
+        4. Confidence level (0-100%)
+        5. Key assumptions
+        6. Risk factors
+        
+        Format as structured forecasts.
+        """
+        
+        forecasts = await self.generate_llm_response(
+            prompt=forecast_prompt,
+            task_type="trend_analysis",
+            complexity="high",
+            use_context=False
+        )
+        
+        # Extract insights using LLM
+        insights_prompt = f"""
+        Extract key strategic insights from this trend analysis:
+        
+        {trend_analysis}
+        
+        Provide 5-7 bullet point insights that are:
+        1. Actionable
+        2. Strategic
+        3. Data-driven
+        4. Business-relevant
+        5. Clear and concise
+        """
+        
+        insights_response = await self.generate_llm_response(
+            prompt=insights_prompt,
+            task_type="analysis",
+            complexity="medium",
+            use_context=False
+        )
+        
+        # Parse insights (simplified - in production would use structured response)
         insights = [
-            f"Identified {len(trends)} significant trends",
-            f"Generated forecasts for {len(forecasts)} trend categories",
-            f"Analysis focused on {len(focus_areas)} key areas" if focus_areas else "Comprehensive trend analysis performed"
-        ]
+            line.strip().lstrip('- •').strip() 
+            for line in insights_response.split('\n') 
+            if line.strip() and any(char in line for char in ['•', '-', '1.', '2.'])
+        ][:7]
+        
+        # Generate recommendations
+        recommendations_prompt = f"""
+        Based on the trend analysis and forecasts, provide strategic recommendations:
+        
+        Analysis: {trend_analysis}
+        Forecasts: {forecasts}
+        
+        Provide 3-5 specific, actionable recommendations with:
+        1. Clear action items
+        2. Expected outcomes
+        3. Implementation priority
+        4. Resource requirements
+        5. Success metrics
+        """
+        
+        recommendations_response = await self.generate_llm_response(
+            prompt=recommendations_prompt,
+            task_type="analysis",
+            complexity="high",
+            use_context=False
+        )
         
         recommendations = [
-            "Monitor identified trends closely for strategic decision-making",
-            "Consider early action on high-confidence forecasts",
-            "Review trend analysis quarterly for accuracy validation"
-        ]
+            line.strip().lstrip('- •').strip() 
+            for line in recommendations_response.split('\n') 
+            if line.strip() and any(char in line for char in ['•', '-', '1.', '2.'])
+        ][:5]
         
         return {
             "analysis_type": "trend_analysis",
-            "trends_identified": trends,
+            "trends_identified": trend_analysis,
             "forecasts": forecasts,
             "focus_areas": focus_areas,
             "insights": insights,
             "recommendations": recommendations,
-            "summary": f"Trend analysis identified {len(trends)} key trends with varying confidence levels",
-            "confidence": self._calculate_analysis_confidence(trends),
-            "methodology": "statistical_trend_analysis_with_forecasting"
+            "summary": f"Comprehensive trend analysis identified multiple key trends with strategic implications for {focus_areas_text}",
+            "confidence": 0.85,  # High confidence with LLM analysis
+            "methodology": "llm_enhanced_trend_analysis"
         }
     
     async def _perform_comparative_analysis(
@@ -310,37 +400,169 @@ class AnalystAgent(BaseAIAgent):
         """Perform SWOT analysis."""
         self.logger.info(f"Performing SWOT analysis for: {subject}")
         
-        # Extract SWOT elements from context (simplified implementation)
-        swot = {
-            "strengths": self._extract_swot_elements(context, "strengths"),
-            "weaknesses": self._extract_swot_elements(context, "weaknesses"),
-            "opportunities": self._extract_swot_elements(context, "opportunities"),
-            "threats": self._extract_swot_elements(context, "threats")
+        # Prepare context data for LLM
+        context_summary = str(context)[:2000]  # Limit context size
+        
+        # Use LLM to perform comprehensive SWOT analysis
+        swot_prompt = f"""
+        As a strategic analyst, perform a comprehensive SWOT analysis for: {subject}
+        
+        Context Information:
+        {context_summary}
+        
+        Analyze and identify:
+        
+        STRENGTHS:
+        - Internal capabilities and advantages
+        - Unique resources and competencies
+        - Positive attributes and assets
+        
+        WEAKNESSES:
+        - Internal limitations and disadvantages
+        - Areas needing improvement
+        - Resource constraints
+        
+        OPPORTUNITIES:
+        - External factors that could be advantageous
+        - Market trends and openings
+        - Potential areas for growth
+        
+        THREATS:
+        - External challenges and risks
+        - Competitive pressures
+        - Market or environmental dangers
+        
+        For each category, provide 3-5 specific, relevant points with brief explanations.
+        """
+        
+        swot_schema = {
+            "type": "object",
+            "properties": {
+                "strengths": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "item": {"type": "string"},
+                            "explanation": {"type": "string"},
+                            "impact_level": {"type": "string", "enum": ["high", "medium", "low"]}
+                        }
+                    }
+                },
+                "weaknesses": {
+                    "type": "array",
+                    "items": {
+                        "type": "object", 
+                        "properties": {
+                            "item": {"type": "string"},
+                            "explanation": {"type": "string"},
+                            "impact_level": {"type": "string", "enum": ["high", "medium", "low"]}
+                        }
+                    }
+                },
+                "opportunities": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "item": {"type": "string"},
+                            "explanation": {"type": "string"},
+                            "probability": {"type": "string", "enum": ["high", "medium", "low"]}
+                        }
+                    }
+                },
+                "threats": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "item": {"type": "string"},
+                            "explanation": {"type": "string"},
+                            "probability": {"type": "string", "enum": ["high", "medium", "low"]}
+                        }
+                    }
+                }
+            },
+            "required": ["strengths", "weaknesses", "opportunities", "threats"]
         }
         
-        # Generate strategic insights
-        insights = []
-        for category, items in swot.items():
-            if items:
-                insights.append(f"Identified {len(items)} key {category}")
+        swot_result = await self.generate_llm_response(
+            prompt=swot_prompt,
+            task_type="swot_analysis",
+            complexity="high",
+            structured_schema=swot_schema,
+            use_context=True
+        )
         
-        # Strategic recommendations
+        # Generate strategic insights based on SWOT
+        insights_prompt = f"""
+        Based on this SWOT analysis for {subject}, generate strategic insights:
+        
+        {str(swot_result)}
+        
+        Provide insights on:
+        1. Key strategic priorities
+        2. Critical success factors
+        3. Major risks to address
+        4. Competitive advantages to leverage
+        5. Strategic options and alternatives
+        """
+        
+        strategic_insights = await self.generate_llm_response(
+            prompt=insights_prompt,
+            task_type="analysis",
+            complexity="high",
+            use_context=False
+        )
+        
+        # Parse insights
+        insights = [
+            line.strip().lstrip('- •').strip() 
+            for line in strategic_insights.split('\n') 
+            if line.strip() and any(char in line for char in ['•', '-', '1.', '2.'])
+        ][:5]
+        
+        # Generate strategic recommendations
+        recommendations_prompt = f"""
+        Based on the SWOT analysis, provide specific strategic recommendations for {subject}:
+        
+        SWOT Results: {str(swot_result)}
+        
+        Generate 4-6 actionable recommendations that:
+        1. Leverage strengths to capitalize on opportunities (SO strategies)
+        2. Use strengths to mitigate threats (ST strategies) 
+        3. Address weaknesses to pursue opportunities (WO strategies)
+        4. Minimize weaknesses and avoid threats (WT strategies)
+        
+        Each recommendation should be specific and actionable.
+        """
+        
+        recommendations_response = await self.generate_llm_response(
+            prompt=recommendations_prompt,
+            task_type="analysis",
+            complexity="high",
+            use_context=False
+        )
+        
         recommendations = [
-            "Leverage strengths to capitalize on opportunities",
-            "Address weaknesses that could become vulnerabilities",
-            "Develop contingency plans for identified threats",
-            "Create action plans for high-priority opportunities"
-        ]
+            line.strip().lstrip('- •').strip() 
+            for line in recommendations_response.split('\n') 
+            if line.strip() and any(char in line for char in ['•', '-', '1.', '2.'])
+        ][:6]
+        
+        # Calculate total items for summary
+        total_items = sum(len(category) for category in swot_result.values() if isinstance(category, list))
         
         return {
             "analysis_type": "swot_analysis",
             "subject": subject,
-            "swot_matrix": swot,
+            "swot_matrix": swot_result,
+            "strategic_insights": strategic_insights,
             "insights": insights,
             "recommendations": recommendations,
-            "summary": f"SWOT analysis for {subject} identified {sum(len(v) for v in swot.values())} strategic factors",
-            "confidence": 0.8,  # SWOT is generally high-confidence when well-structured
-            "methodology": "structured_swot_framework_analysis"
+            "summary": f"SWOT analysis for {subject} identified {total_items} strategic factors across all categories",
+            "confidence": 0.9,  # High confidence with structured LLM analysis
+            "methodology": "llm_enhanced_structured_swot_analysis"
         }
     
     async def _perform_risk_assessment(

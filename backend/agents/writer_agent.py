@@ -125,11 +125,18 @@ class WriterAgent(BaseAIAgent):
             
             # Execute writing task based on type
             if task_type == "report_writing":
-                result = await self._write_report(
-                    data=content_data,
+                # Determine target word count based on length
+                target_words = {
+                    "short": 1000,
+                    "medium": 2500,
+                    "long": 5000
+                }.get(content_length, 2500)
+                
+                result = await self._perform_report_writing(
+                    content=content_data,
                     style=writing_style,
                     audience=target_audience,
-                    include_citations=include_citations
+                    target_words=target_words
                 )
             elif task_type == "article_writing":
                 result = await self._write_article(
@@ -139,7 +146,7 @@ class WriterAgent(BaseAIAgent):
                 )
             elif task_type == "summary_writing":
                 result = await self._write_summary(
-                    source_content=content_data,
+                    content=content_data,
                     style=writing_style,
                     length=content_length
                 )
@@ -247,124 +254,354 @@ class WriterAgent(BaseAIAgent):
             
             raise
     
-    async def _write_report(
+    async def _perform_report_writing(
         self, 
-        data: Dict[str, Any], 
+        content: Dict[str, Any], 
         style: str,
         audience: str,
-        include_citations: bool
+        target_words: int
     ) -> Dict[str, Any]:
-        """Write a comprehensive report."""
-        self.logger.info("Writing comprehensive report")
+        """Perform report writing task."""
+        self.logger.info(f"Writing {style} report for {audience} audience ({target_words} words)")
         
-        # Get content structuring tool
-        structuring_tool = next((tool for tool in self._tools if hasattr(tool, 'name') and tool.name == 'content_structuring'), None)
+        # Extract content elements
+        title = content.get("title", "Research Report")
+        research_data = content.get("research_data", {})
+        analysis_data = content.get("analysis_data", {})
         
-        if not structuring_tool:
-            raise AgentException("Content structuring tool not available", error_code="TOOL_NOT_AVAILABLE")
+        # Create comprehensive writing prompt
+        writing_prompt = f"""
+        Write a comprehensive {style} report titled "{title}" for a {audience} audience.
         
-        # Structure the report
-        structured_result = await structuring_tool.execute(
-            content=str(data),
-            structure_type="report"
+        Target length: approximately {target_words} words
+        
+        Research Findings:
+        {str(research_data)[:1500] if research_data else "No research data provided"}
+        
+        Analysis Results:
+        {str(analysis_data)[:1500] if analysis_data else "No analysis data provided"}
+        
+        Structure the report with:
+        1. Executive Summary (10-15% of content)
+        2. Introduction and Background (15-20% of content)
+        3. Key Findings (30-40% of content) 
+        4. Analysis and Insights (25-35% of content)
+        5. Recommendations (10-15% of content)
+        6. Conclusion (5-10% of content)
+        
+        Writing Requirements:
+        - Professional {style} tone
+        - Clear, engaging language appropriate for {audience}
+        - Well-structured paragraphs and transitions
+        - Evidence-based arguments
+        - Actionable insights and recommendations
+        
+        Format in markdown with proper headings and structure.
+        """
+        
+        # Generate the main report content
+        report_content = await self.generate_llm_response(
+            prompt=writing_prompt,
+            task_type="report_writing",
+            complexity="high",
+            urgency="normal",
+            use_context=True
         )
         
-        # Generate report sections
-        sections = self._generate_report_sections(data, style, audience)
+        # Generate an enhanced executive summary
+        summary_prompt = f"""
+        Create a compelling executive summary for this report:
         
-        # Compile full report
-        report_content = self._compile_report(sections, style, include_citations)
+        {report_content[:2000]}
         
-        # Calculate quality metrics
-        quality_metrics = self._assess_content_quality(report_content, "report")
+        The executive summary should:
+        1. Capture the key findings in 150-200 words
+        2. Highlight the most important insights
+        3. Present clear value proposition
+        4. Include key recommendations
+        5. Be suitable for {audience} stakeholders
+        
+        Write in a {style} tone that encourages further reading.
+        """
+        
+        executive_summary = await self.generate_llm_response(
+            prompt=summary_prompt,
+            task_type="summary_writing",
+            complexity="medium",
+            use_context=False
+        )
+        
+        # Create table of contents
+        toc_prompt = f"""
+        Generate a detailed table of contents for this report:
+        
+        {report_content[:1000]}
+        
+        Create a professional table of contents with:
+        1. Main sections with page numbers (estimate)
+        2. Sub-sections where appropriate
+        3. Professional formatting
+        4. Logical flow and structure
+        """
+        
+        table_of_contents = await self.generate_llm_response(
+            prompt=toc_prompt,
+            task_type="content_structuring",
+            complexity="low",
+            use_context=False
+        )
+        
+        # Combine all elements into final report
+        final_report = f"""# {title}
+
+## Table of Contents
+{table_of_contents}
+
+---
+
+## Executive Summary
+{executive_summary}
+
+---
+
+{report_content}
+
+---
+
+*This report was generated using advanced AI research and analysis capabilities.*
+"""
+        
+        # Analyze the content quality
+        quality_metrics = self._assess_content_quality(final_report, "report")
+        
+        # Validate length
+        word_count = len(final_report.split())
+        length_validation = self._validate_content_length(final_report)
         
         return {
-            "content": report_content,
-            "sections": sections,
-            "word_count": len(report_content.split()),
-            "quality_score": quality_metrics["overall_score"],
-            "quality_metrics": quality_metrics,
+            "content": final_report,
+            "content_type": "report",
             "style": style,
             "audience": audience,
-            "citations_included": include_citations,
-            "summary": f"Comprehensive report generated with {len(sections)} sections",
-            "content_type": "report"
+            "title": title,
+            "word_count": word_count,
+            "target_words": target_words,
+            "length_validation": length_validation,
+            "quality_metrics": quality_metrics,
+            "sections": {
+                "executive_summary": executive_summary,
+                "main_content": report_content,
+                "table_of_contents": table_of_contents
+            },
+            "format": "markdown",
+            "status": "completed"
         }
     
     async def _write_article(
         self, 
         content: Dict[str, Any], 
         style: str,
-        length: str
+        audience: str,
+        target_words: int
     ) -> Dict[str, Any]:
-        """Write an article."""
-        self.logger.info(f"Writing {length} {style} article")
+        """Write an engaging article."""
+        self.logger.info(f"Writing {style} article for {audience} audience ({target_words} words)")
         
-        # Determine target word count based on length
-        target_words = {
-            "short": 500,
-            "medium": 1500,
-            "long": 3000
-        }.get(length, 1500)
+        # Extract content elements
+        title = content.get("title", "Article Title")
+        topic = content.get("topic", title)
+        research_data = content.get("research_data", {})
+        key_points = content.get("key_points", [])
         
-        # Generate article structure
-        article_structure = self._create_article_structure(content, style, target_words)
+        # Create article writing prompt
+        article_prompt = f"""
+        Write an engaging {style} article titled "{title}" for a {audience} audience.
         
-        # Write article content
-        article_content = self._write_article_content(article_structure, style)
+        Topic: {topic}
+        Target length: approximately {target_words} words
         
-        # Quality assessment
+        Research Data:
+        {str(research_data)[:1500] if research_data else "Use your knowledge base"}
+        
+        Key Points to Cover:
+        {chr(10).join(f"- {point}" for point in key_points) if key_points else "Cover comprehensive aspects of the topic"}
+        
+        Structure Requirements:
+        1. Compelling introduction with hook (15-20%)
+        2. Well-organized main content with subheadings (60-70%)
+        3. Strong conclusion with call-to-action or key takeaways (10-15%)
+        
+        Writing Style:
+        - {style} tone appropriate for {audience}
+        - Engaging and informative
+        - Clear, readable language
+        - Logical flow with smooth transitions
+        - Include relevant examples and insights
+        
+        Format in markdown with proper headings.
+        """
+        
+        # Generate article content
+        article_content = await self.generate_llm_response(
+            prompt=article_prompt,
+            task_type="article_writing",
+            complexity="medium",
+            urgency="normal",
+            use_context=True
+        )
+        
+        # Generate an engaging introduction if needed
+        if not article_content.startswith('#'):
+            intro_prompt = f"""
+            Create an engaging introduction for this article about "{topic}":
+            
+            {article_content[:500]}
+            
+            The introduction should:
+            1. Hook the reader immediately
+            2. Clearly state the topic and value
+            3. Preview what readers will learn
+            4. Be 2-3 paragraphs (100-150 words)
+            5. Match the {style} tone for {audience}
+            """
+            
+            introduction = await self.generate_llm_response(
+                prompt=intro_prompt,
+                task_type="content_writing",
+                complexity="medium",
+                use_context=False
+            )
+            
+            # Prepend introduction to article
+            article_content = f"# {title}\n\n{introduction}\n\n{article_content}"
+        
+        # Analyze content quality
         quality_metrics = self._assess_content_quality(article_content, "article")
+        
+        # Validate length
+        word_count = len(article_content.split())
+        length_validation = self._validate_content_length(article_content)
         
         return {
             "content": article_content,
-            "structure": article_structure,
-            "word_count": len(article_content.split()),
-            "target_word_count": target_words,
-            "quality_score": quality_metrics["overall_score"],
-            "quality_metrics": quality_metrics,
+            "content_type": "article",
             "style": style,
-            "length_category": length,
-            "summary": f"{style.title()} article written with {len(article_content.split())} words",
-            "content_type": "article"
+            "audience": audience,
+            "title": title,
+            "topic": topic,
+            "word_count": word_count,
+            "target_words": target_words,
+            "length_validation": length_validation,
+            "quality_metrics": quality_metrics,
+            "key_points_covered": key_points,
+            "format": "markdown",
+            "status": "completed"
         }
     
     async def _write_summary(
         self, 
-        source_content: Dict[str, Any], 
+        content: Dict[str, Any], 
         style: str,
         length: str
     ) -> Dict[str, Any]:
         """Write a summary of provided content."""
-        self.logger.info(f"Writing {length} summary in {style} style")
+        self.logger.info(f"Writing {length} {style} summary")
         
-        # Extract key information
-        key_points = self._extract_key_points(source_content)
-        
-        # Determine summary length
+        # Determine target word count based on length
         target_words = {
-            "brief": 150,
+            "short": 150,
             "medium": 300,
-            "detailed": 600
+            "long": 600
         }.get(length, 300)
         
-        # Generate summary
-        summary_content = self._generate_summary_content(key_points, style, target_words)
+        # Extract source content
+        source_content = content.get("source_content", "")
+        if not source_content:
+            # Try to extract from other content fields
+            source_content = str(content.get("research_data", content.get("analysis_data", content)))
         
-        # Quality assessment
+        # Create summary writing prompt
+        summary_prompt = f"""
+        Create a {style} summary of the following content with approximately {target_words} words:
+        
+        Source Content:
+        {str(source_content)[:2500]}
+        
+        Summary Requirements:
+        1. Capture the main points and key insights
+        2. Maintain {style} tone and professional language
+        3. Structure with clear logical flow
+        4. Include most important findings and conclusions
+        5. Target length: {target_words} words
+        6. Be concise yet comprehensive
+        
+        Focus on:
+        - Essential information and key takeaways
+        - Critical insights and findings
+        - Important recommendations or conclusions
+        - Actionable points where relevant
+        
+        Format as well-structured paragraphs.
+        """
+        
+        # Generate summary content
+        summary_content = await self.generate_llm_response(
+            prompt=summary_prompt,
+            task_type="summary_writing",
+            complexity="medium",
+            urgency="normal",
+            use_context=False
+        )
+        
+        # Extract key points from the summary
+        key_points_prompt = f"""
+        Extract 3-5 key bullet points from this summary:
+        
+        {summary_content}
+        
+        Present as:
+        • Key point 1
+        • Key point 2
+        • etc.
+        
+        Each point should be concise and capture a main insight.
+        """
+        
+        key_points_response = await self.generate_llm_response(
+            prompt=key_points_prompt,
+            task_type="content_structuring",
+            complexity="low",
+            use_context=False
+        )
+        
+        # Parse key points
+        key_points = [
+            line.strip().lstrip('• -').strip() 
+            for line in key_points_response.split('\n') 
+            if line.strip() and any(char in line for char in ['•', '-'])
+        ]
+        
+        # Analyze content quality
         quality_metrics = self._assess_content_quality(summary_content, "summary")
+        
+        # Validate length
+        word_count = len(summary_content.split())
+        length_validation = self._validate_content_length(summary_content)
         
         return {
             "content": summary_content,
-            "key_points": key_points,
-            "word_count": len(summary_content.split()),
-            "target_word_count": target_words,
-            "compression_ratio": len(str(source_content)) / len(summary_content),
-            "quality_score": quality_metrics["overall_score"],
-            "quality_metrics": quality_metrics,
+            "content_type": "summary",
             "style": style,
-            "summary": f"Summary generated capturing {len(key_points)} key points",
-            "content_type": "summary"
+            "length_category": length,
+            "word_count": word_count,
+            "target_words": target_words,
+            "key_points": key_points,
+            "length_validation": length_validation,
+            "quality_metrics": quality_metrics,
+            "source_word_count": len(str(source_content).split()),
+            "compression_ratio": word_count / max(1, len(str(source_content).split())),
+            "format": "text",
+            "status": "completed"
         }
     
     async def _edit_content(
