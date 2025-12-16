@@ -12,7 +12,7 @@ A sophisticated AI research assistant that leverages three specialized agents (R
 
 ## 🌟 **Features**
 
-### 🤖 **Multi-Agent Intelligence**
+### 🤖 **Multi-Agent Intelligence and Performsnces**
 - **Researcher Agent**: Conducts thorough research using multiple sources
 - **Analyst Agent**: Performs strategic analysis and pattern recognition  
 - **Writer Agent**: Creates well-structured, professional content
