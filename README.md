@@ -133,7 +133,7 @@ docker build --target production -t ai-research-assistant:latest .
 
 ## 📞 **Support**
 
-- **Documentation**: [Full documentation](https://your-username.github.io/ai-research-assistant/)
+- **Documentation**: [Full documentation](https://your-username.github.io/ai-research-assistant_prime/)
 - **Issues**: [GitHub Issues](https://github.com/your-username/ai-research-assistant/issues)
 
 **Built with ❤️ by the AI Research Team**
